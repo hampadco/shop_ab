@@ -8,50 +8,52 @@ using Microsoft.AspNetCore.Mvc;
 public class Shop : Controller
 {
 
-    //list static Colors string array
-    public static List<string> Colors = new List<string> { "Red", "Green", "Blue" };
+     Context db = new Context();
 
-    //get all colors
-    [HttpGet]
-    public IActionResult GetColors()
-    {
-        return Ok(Colors);
-    }
-
-    //insert new color
-    [HttpPost]
-    public IActionResult Insert(string color)
-    {
-        Colors.Add(color);
-        return Ok();
-    }
-
-    //delete color
-    [HttpDelete]
-    public IActionResult Delete(string color)
-    {
-        //check if exist
-        if (!Colors.Contains(color))
+     //insert
+        [HttpPost]
+        public IActionResult Insert([FromBody] Product product)
         {
-            return NotFound();
+            db.Tbl_product.Add(product);
+            db.SaveChanges();
+            return Ok();
         }
-        Colors.Remove(color);
-        return Ok();
-    }
 
-    //update color
-    [HttpPut]
-    public IActionResult Update(string oldColor, string newColor)
-    {
-        //check if exist
-        if (!Colors.Contains(oldColor))
+        //get all
+        [HttpGet]
+        public IActionResult GetAll()
         {
-            return NotFound();
+            var products = db.Tbl_product.ToList();
+            return Ok(products);
         }
-        Colors.Remove(oldColor);
-        Colors.Add(newColor);
-        return Ok();
-    }
+
+
+        //delete
+        [HttpDelete]
+        public IActionResult Delete(int id)
+        {
+            //lambda expression
+            var product = db.Tbl_product.Find(id);
+            db.Tbl_product.Remove(product);
+            db.SaveChanges();
+            return Ok();
+        }
+
+        //update
+        [HttpPut]
+        public IActionResult Update([FromBody] Product product)
+        {
+            var p = db.Tbl_product.Find(product.Id);
+            p.Name = product.Name;
+            p.Price = product.Price;
+
+            db.Tbl_product.Update(p);
+            db.SaveChanges();
+            return Ok();
+           
+        }
+
+   
 
 
     
